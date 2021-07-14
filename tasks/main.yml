@@ -1,0 +1,23 @@
+---
+# tasks file for install-docker
+- name: Install prereq packages
+  apt:
+    update_cache: yes
+    name: "{{ item }}"
+  loop: "{{ docker_prereq_packages }}"
+
+- name: Install docker
+  shell: > 
+    curl -fsSL https://get.docker.com | sh
+
+- name: Set systemd as cgroup
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/
+
+- name: Restart docker
+  become: true
+  shell: >
+    systemctl enable docker
+    systemctl daemon-reload
+    systemctl restart docker
